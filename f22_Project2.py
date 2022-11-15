@@ -72,36 +72,40 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
+    policy_list = []
+    room_list = []
+    bedroom_list = []
+
     file = "html_files/listing_" + str(listing_id) + ".html"
     with open(file, 'r') as f:
         contents = f.read()
         soup = BeautifulSoup(contents, 'html.parser')
-    
+    f.close()
     policy_tag = soup.find("li", class_ = "f19phm7j dir dir-ltr").find("span")
-    if "pending" or "Pending" in policy_tag.text:
-        policy_num = "Pending"
-    elif "exempt" or "Exempt" or "License not needed per OSTR" in policy_tag.text:
-        policy_num = "Exempt"
+    if ("pending" in policy_tag.text) or ("Pending" in policy_tag.text):
+        policy_list.append("Pending")
+    elif ("exempt" in policy_tag.text) or ("Exempt" in policy_tag.text) or ("License not needed per OSTR" in policy_tag.text):
+        policy_list.append("Exempt")
     else:
-        policy_num = policy_tag.text
+        policy_list.append(policy_tag.text)
 
     room_type = soup.find("h2", class_ = "_14i3z6h")
-    if "private" or "Private" in room_type.text:
-        place = "Private Room"
-    elif "shared" or "Shared" in room_type.text:
-        place = "Shared Room"
+    if ("private" in room_type.text) or ("Private" in room_type.text):
+        room_list.append("Private Room")
+    elif ("shared" in room_type.text) or ("Shared" in room_type.text):
+        room_list.append("Shared Room")
     else:
-        place = "Entire Room"
+        room_list.append("Entire Room")
 
-    bedroom_num = soup.find_all("li", class_ = "l7n4lsf dir dir-ltr")
-    bed = bedroom_num[1].find_all("span")
+    bedroom_num = soup.find_all("li", class_ = "l7n4lsf dir dir-ltr")[1]
+    bed = bedroom_num.find_all("span")
     if "studio" or "Studio" in bed.text:
-        bedroom = "1"
+        bedroom_list.append(1)
     else:
-        bedroom = bed[2].text[0]
-    bedroom_int = int(bedroom)
-
-    tup = (policy_num, place, bedroom_int)
+        bedroom_list.append(int(bed[2].text[0]))
+    
+    for i in range(len(policy_list)):
+        tup = (policy_list[i], room_list[i], bedroom_list[i])
     return tup
 
 
@@ -251,12 +255,11 @@ class TestCases(unittest.TestCase):
             # check that the third element in the tuple is an int
             self.assertEqual(type(listing_information[2]), int)
         # check that the first listing in the html_list has policy number 'STR-0001541'
-        print(get_listing_information("1623609"))
-
-        # self.assertEqual(get_listing_information(html_list[0])[0], 'STR-0001541')
+        self.assertEqual(get_listing_information(html_list[0])[0],'STR-0001541')
         # check that the last listing in the html_list is a "Private Room"
-        # self.assertEqual(get_listing_information(html_list[-1])[0], "Private Room")
+        self.assertEqual(get_listing_information(html_list[-1])[1], "Private Room")
         # check that the third listing has one bedroom
+        self.assertEqual(get_listing_information(html_list[2])[2], 1)
     
         
 
@@ -270,7 +273,7 @@ class TestCases(unittest.TestCase):
             # assert each item in the list of listings is a tuple
             self.assertEqual(type(item), tuple)
             # check that each tuple has a length of 6
-
+            self.assertEqual(len(type), 6)
         # check that the first tuple is made up of the following:
         # 'Loft in Mission District', 210, '1944564', '2022-004088STR', 'Entire Room', 1
 
