@@ -113,7 +113,6 @@ def get_listing_information(listing_id):
 
 
 
-
 def get_detailed_listing_database(html_file):
     """
     Write a function that calls the above two functions in order to return
@@ -316,11 +315,11 @@ class TestCases(unittest.TestCase):
         # check that the return value is a list
         self.assertEqual(type(invalid_listings), list)
         # check that there is exactly one element in the string
-
+        self.assertEqual(len(invalid_listings), 1)
         # check that the element in the list is a string
-
+        self.assertEqual(type(invalid_listings[0]), str)
         # check that the first element in the list is '16204265'
-        
+        self.assertEqual(invalid_listings[0], '16204265')
 
 
 if __name__ == '__main__':
